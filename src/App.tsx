@@ -5,10 +5,13 @@ import { LanguageSelector } from './components/LanguageSelector';
 import { ThemeToggle } from './components/ThemeToggle';
 import { DonationBlock } from './components/DonationBlock';
 
+const DONATION_ENABLED = false;
+
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
   const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [showDonation, setShowDonation] = useState(DONATION_ENABLED);
 
   // Use selected language translations with fallback to English
   const t = translations[currentLanguage] || translations.en;
@@ -49,7 +52,6 @@ function App() {
     orbColor3: isDarkTheme ? 'bg-blue-500/20' : 'bg-blue-400/30',
     gridPattern: isDarkTheme ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.4)',
     particleColor: isDarkTheme ? 'bg-cyan-400' : 'bg-purple-500',
-    mouseFollower: isDarkTheme ? 'from-purple-500 to-cyan-500' : 'from-purple-600 to-pink-500',
     footerBorder: isDarkTheme ? 'border-purple-500/20' : 'border-purple-300/30'
   };
 
@@ -401,12 +403,18 @@ function App() {
         </div>
       </section>
 
-      {/* Donation Section - Hidden */}
-      {/* <section className={`py-16 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 ${currentLanguage === 'ar' ? 'rtl' : 'ltr'}`}>
-        <div className="max-w-4xl mx-auto">
-          <DonationBlock isDark={isDarkTheme} currentLanguage={currentLanguage} />
-        </div>
-      </section> */}
+      {/* Donation Section */}
+      {showDonation && (
+        <section className={`py-10 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 ${currentLanguage === 'ar' ? 'rtl' : 'ltr'}`}>
+          <div className="max-w-4xl mx-auto">
+            <DonationBlock
+              isDark={isDarkTheme}
+              currentLanguage={currentLanguage}
+              onClose={() => setShowDonation(false)}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className={`py-16 px-6 border-t ${themeClasses.footerBorder} relative z-10 ${currentLanguage === 'ar' ? 'rtl' : 'ltr'}`}>

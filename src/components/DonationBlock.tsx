@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Heart, Coffee, Zap, Star, Gift } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import type { FC } from 'react';
+import { Heart, Coffee, Zap, Star, Gift, X } from 'lucide-react';
 
 interface DonationBlockProps {
   isDark: boolean;
   currentLanguage: string;
+  onClose?: () => void;
 }
 
 const donationTexts: Record<string, {
@@ -319,10 +321,31 @@ const donationTexts: Record<string, {
   }
 };
 
-export const DonationBlock: React.FC<DonationBlockProps> = ({ isDark, currentLanguage }) => {
+export const DonationBlock: FC<DonationBlockProps> = ({ isDark, currentLanguage, onClose }) => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [showThankYou, setShowThankYou] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    onClose?.();
+  }, [onClose]);
+
+  // Auto-hide after 8 seconds
+  useEffect(() => {
+    if (!isVisible) {
+      return;
+    }
+
+    const timer = setTimeout(handleClose, 8000);
+
+    return () => clearTimeout(timer);
+  }, [handleClose, isVisible]);
+
+  if (!isVisible) {
+    return null;
+  }
 
   const t = donationTexts[currentLanguage] || donationTexts.en;
   
@@ -377,6 +400,15 @@ export const DonationBlock: React.FC<DonationBlockProps> = ({ isDark, currentLan
 
   return (
     <div className={`relative p-8 rounded-3xl ${themeClasses.background} border ${themeClasses.border} backdrop-blur-sm overflow-hidden`}>
+      {/* Close button */}
+      <button
+        onClick={handleClose}
+        className={`absolute top-4 right-4 z-20 p-2 rounded-full ${isDark ? 'bg-slate-700/50 hover:bg-slate-600/50 text-gray-300 hover:text-white' : 'bg-white/70 hover:bg-white/90 text-gray-600 hover:text-gray-900'} transition-all duration-300`}
+        aria-label="Close"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      
       {/* Decorative background */}
       <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-br from-purple-500/5 to-pink-500/5' : 'bg-gradient-to-br from-purple-100/50 to-pink-100/50'}`}></div>
       
